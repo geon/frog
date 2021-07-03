@@ -75,6 +75,38 @@ export function addCorner(
 	return { ...mesh, highestId, cornerIds, cornerAttributes };
 }
 
+export function extrudeCorner(
+	mesh: Mesh,
+	cornerId: CornerId,
+	offset: Coord3,
+): Mesh {
+	const oldCornerAttributes = mesh.cornerAttributes.get(cornerId)!;
+
+	mesh = addCorner(mesh, {
+		...oldCornerAttributes,
+		position: Coord3.add(oldCornerAttributes.position, offset),
+	});
+
+	// TODO. Terrible.
+	const newCornerId = mesh.highestId;
+	const halfEdgeAId = nextId(mesh);
+	const halfEdgeBId = halfEdgeAId + 1;
+
+	const halfEdges = [...mesh.halfEdges];
+	halfEdges.push({
+		id: halfEdgeAId,
+		cornerId,
+		nextEdgeIdAroundPolygon: halfEdgeBId,
+	});
+	halfEdges.push({
+		id: halfEdgeBId,
+		cornerId: newCornerId,
+		nextEdgeIdAroundPolygon: halfEdgeAId,
+	});
+
+	return { ...mesh, highestId: halfEdgeBId, halfEdges };
+}
+
 export function makeTestMesh(): Mesh {
 	const cornerIds = [...makeRange(4)];
 	const frontHalfEdgeIds = [...makeRange(4)];
