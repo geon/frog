@@ -55,6 +55,26 @@ export function makeEmptyMesh(): Mesh {
 	};
 }
 
+function nextId(mesh: Mesh) {
+	return mesh.highestId + 1;
+}
+
+export function addCorner(
+	mesh: Mesh,
+	attributes: { position: Coord3; normal: Coord3 },
+): Mesh {
+	const highestId = nextId(mesh);
+
+	const cornerIds = new Set(mesh.cornerIds);
+	cornerIds.add(highestId);
+
+	const cornerAttributes = new Map(mesh.cornerAttributes);
+	cornerAttributes.set(highestId, attributes);
+
+	// const corner:Corner = {id:highestId}
+	return { ...mesh, highestId, cornerIds, cornerAttributes };
+}
+
 export function makeTestMesh(): Mesh {
 	const cornerIds = [...makeRange(4)];
 	const frontHalfEdgeIds = [...makeRange(4)];
