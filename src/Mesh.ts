@@ -62,7 +62,7 @@ function nextId(mesh: Mesh) {
 export function addCorner(
 	mesh: Mesh,
 	attributes: { position: Coord3; normal: Coord3 },
-): Mesh {
+): { mesh: Mesh; newCornerId: CornerId } {
 	const highestId = nextId(mesh);
 
 	const cornerIds = new Set(mesh.cornerIds);
@@ -72,7 +72,10 @@ export function addCorner(
 	cornerAttributes.set(highestId, attributes);
 
 	// const corner:Corner = {id:highestId}
-	return { ...mesh, highestId, cornerIds, cornerAttributes };
+	return {
+		mesh: { ...mesh, highestId, cornerIds, cornerAttributes },
+		newCornerId: highestId,
+	};
 }
 
 export function extrudeCorner(
@@ -82,13 +85,13 @@ export function extrudeCorner(
 ): Mesh {
 	const oldCornerAttributes = mesh.cornerAttributes.get(cornerId)!;
 
-	mesh = addCorner(mesh, {
+	const { newCornerId, ...rest } = addCorner(mesh, {
 		...oldCornerAttributes,
 		position: Coord3.add(oldCornerAttributes.position, offset),
 	});
+	mesh = rest.mesh;
 
 	// TODO. Terrible.
-	const newCornerId = mesh.highestId;
 	const halfEdgeAId = nextId(mesh);
 	const halfEdgeBId = halfEdgeAId + 1;
 
