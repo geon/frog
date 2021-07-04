@@ -23,8 +23,7 @@ export class MeshTestSuite {
 
 	@Test()
 	extrudeCorner() {
-		let { mesh, newCorner } = makeOneCornerMesh();
-		mesh = extrudeCorner(mesh, newCorner, new Coord3({ x: 2, y: 0, z: 0 }));
+		let mesh = makeOneEdgeMesh();
 		expect.toBeEqual(mesh.halfEdges.length, 2);
 		expect.toBeEqual(mesh.halfEdges[0].polygon, undefined);
 		expect.toBeEqual(mesh.halfEdges[1].polygon, undefined);
@@ -50,4 +49,9 @@ function makeOneCornerMesh() {
 		}),
 		position,
 	};
+}
+
+function makeOneEdgeMesh() {
+	const { mesh, newCorner } = makeOneCornerMesh();
+	return extrudeCorner(mesh, newCorner, new Coord3({ x: 1, y: 0, z: 0 }));
 }
