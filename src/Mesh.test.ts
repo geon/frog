@@ -15,12 +15,7 @@ export class MeshTestSuite {
 
 	@Test()
 	addCorner() {
-		const position = new Coord3({ x: 0, y: 0, z: 0 });
-		const normal = new Coord3({ x: 0, y: 0, z: 1 });
-		const { mesh } = addCorner(makeEmptyMesh(), {
-			position,
-			normal,
-		});
+		const { mesh, position } = makeOneCornerMesh();
 		expect.toBeEqual(mesh.corners.length, 1);
 		expect.toBeEqual(mesh.cornerAttributes.size, 1);
 		expect.toBeEqual([...mesh.cornerAttributes.values()][0].position, position);
@@ -28,11 +23,7 @@ export class MeshTestSuite {
 
 	@Test()
 	extrudeCorner() {
-		const normal = new Coord3({ x: 0, y: 0, z: 1 });
-		let { mesh, newCorner } = addCorner(makeEmptyMesh(), {
-			position: new Coord3({ x: -1, y: 0, z: 0 }),
-			normal,
-		});
+		let { mesh, newCorner } = makeOneCornerMesh();
 		mesh = extrudeCorner(mesh, newCorner, new Coord3({ x: 2, y: 0, z: 0 }));
 		expect.toBeEqual(mesh.halfEdges.length, 2);
 		expect.toBeEqual(mesh.halfEdges[0].polygon, undefined);
@@ -46,4 +37,17 @@ export class MeshTestSuite {
 			mesh.halfEdges[0],
 		);
 	}
+}
+
+function makeOneCornerMesh() {
+	const position = new Coord3({ x: 0, y: 0, z: 0 });
+	const normal = new Coord3({ x: 0, y: 0, z: 1 });
+
+	return {
+		...addCorner(makeEmptyMesh(), {
+			position,
+			normal,
+		}),
+		position,
+	};
 }
