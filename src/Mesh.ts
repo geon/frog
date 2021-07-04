@@ -9,6 +9,7 @@ export interface Polygon {
 
 export interface HalfEdge {
 	corner: Corner;
+	otherHalf: HalfEdge;
 	polygon?: Polygon;
 
 	// Next edge along the Polygon perimeter clock-wise.
@@ -74,13 +75,16 @@ export function extrudeCorner(
 	const halfEdgeA: HalfEdge = {
 		corner: corner,
 		// The othe edge does not exist yet.
+		otherHalf: undefined!,
 		nextEdgeAroundPolygon: undefined!,
 	};
 	const halfEdgeB: HalfEdge = {
 		corner: newCorner,
+		otherHalf: halfEdgeA!,
 		nextEdgeAroundPolygon: halfEdgeA,
 	};
 	// Now it exists.
+	halfEdgeA.otherHalf = halfEdgeB;
 	halfEdgeA.nextEdgeAroundPolygon = halfEdgeB;
 
 	const newHalfEdges = [halfEdgeA, halfEdgeB];
