@@ -62,7 +62,7 @@ export function extrudeCorner(
 	mesh: Mesh,
 	corner: Corner,
 	offset: Coord3,
-): Mesh {
+): { mesh: Mesh; newHalfEdges: HalfEdge[] } {
 	const oldCornerAttributes = mesh.cornerAttributes.get(corner)!;
 
 	const { newCorner, ...rest } = addCorner(mesh, {
@@ -83,7 +83,12 @@ export function extrudeCorner(
 	// Now it exists.
 	halfEdgeA.nextEdgeAroundPolygon = halfEdgeB;
 
-	return { ...mesh, halfEdges: [...mesh.halfEdges, halfEdgeA, halfEdgeB] };
+	const newHalfEdges = [halfEdgeA, halfEdgeB];
+
+	return {
+		mesh: { ...mesh, halfEdges: [...mesh.halfEdges, ...newHalfEdges] },
+		newHalfEdges,
+	};
 }
 
 export function makeTestMesh(): Mesh {

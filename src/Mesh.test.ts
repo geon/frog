@@ -23,7 +23,7 @@ export class MeshTestSuite {
 
 	@Test()
 	extrudeCorner() {
-		let mesh = makeOneEdgeMesh();
+		let { mesh } = makeOneEdgeMesh();
 		expect.toBeEqual(mesh.halfEdges.length, 2);
 		expect.toBeEqual(mesh.halfEdges[0].polygon, undefined);
 		expect.toBeEqual(mesh.halfEdges[1].polygon, undefined);
