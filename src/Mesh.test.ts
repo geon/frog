@@ -36,6 +36,21 @@ export class MeshTestSuite {
 			mesh.halfEdges[0],
 		);
 	}
+
+	@Test()
+	extrudeCornerOnEdge() {
+		const oneEdgeResult = makeOneEdgeMesh();
+		let { mesh, newHalfEdges } = extrudeCorner(
+			oneEdgeResult.mesh,
+			oneEdgeResult.mesh.corners[1],
+			new Coord3({ x: 1, y: 0, z: 0 }),
+		);
+		expect.toBeEqual(mesh.halfEdges.length, 4);
+		expect.toBeEqual(newHalfEdges[0].polygon, undefined);
+		expect.toBeEqual(newHalfEdges[1].polygon, undefined);
+		expect.toBeEqual(newHalfEdges[0].nextEdgeAroundPolygon, newHalfEdges[1]);
+		expect.toBeEqual(newHalfEdges[1].nextEdgeAroundPolygon, newHalfEdges[0]);
+	}
 }
 
 function makeOneCornerMesh() {
