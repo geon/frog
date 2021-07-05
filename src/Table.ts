@@ -16,7 +16,7 @@ export function makeEmptyTable<T>(): Table<T> {
 	};
 }
 
-export function getTableValues<T>(table: Table<T>): readonly T[] {
+export function getValues<T>(table: Table<T>): readonly T[] {
 	return Object.values(table.values);
 }
 
