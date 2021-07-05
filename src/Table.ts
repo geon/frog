@@ -19,3 +19,9 @@ export function makeEmptyTable<T>(): Table<T> {
 export function getTableValues<T>(table: Table<T>): readonly T[] {
 	return Object.values(table.values);
 }
+
+export function addValue<T>(table: MutableTable<T>, value: T) {
+	const id = table.nextId;
+	table.nextId++;
+	table.values[id] = value;
+}
