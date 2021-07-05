@@ -20,8 +20,13 @@ export function getTableValues<T>(table: Table<T>): readonly T[] {
 	return Object.values(table.values);
 }
 
-export function addValue<T>(table: MutableTable<T>, value: T) {
+export function addValue<T>(table: MutableTable<T>, value: T): TableId {
 	const id = table.nextId;
 	table.nextId++;
 	table.values[id] = value;
+	return id;
+}
+
+export function getValue<T>(table: Table<T>, id: TableId): T {
+	return table.values[id];
 }
