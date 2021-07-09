@@ -1,6 +1,6 @@
 import { Coord3 } from "./Coord3";
 import { TwoDeepReadonly } from "./DeepReadonly";
-import { makeEmptyTable, MutableTable } from "./Table";
+import { addValue, makeEmptyTable, MutableTable, setValue } from "./Table";
 // import * as twgl from "twgl.js";
 
 type CornerId = number;
@@ -20,7 +20,7 @@ export interface Edge {
 
 export interface Polygon {
 	id: PolygonId;
-	firstEdgeId: HalfEdgeId;
+	firstHalfEdgeId: HalfEdgeId;
 	isHole: boolean;
 }
 
@@ -59,24 +59,59 @@ export function makeEmptyMesh(): Mesh {
 	};
 }
 
-// export function addCorner(
-// 	mesh: Mesh,
-// 	attributes: { position: Coord3; normal: Coord3 },
-// ): { mesh: Mesh; newCorner: Corner } {
-// 	const newCorner: Corner = {};
+export function addCorner(
+	mesh: MutableMesh,
+	attributes: { position: Coord3; normal: Coord3 },
+): Corner {
+	const newCorner = addValue(mesh.corners, {
+		// Not yet connected.
+		firstHalfEdgeId: -1,
+	});
 
-// 	return {
-// 		mesh: {
-// 			...mesh,
-// 			corners: [...mesh.corners, newCorner],
-// 			cornerAttributes: new Map([
-// 				...mesh.cornerAttributes,
-// 				[newCorner, attributes],
-// 			]),
-// 		},
-// 		newCorner,
-// 	};
-// }
+	// This is  not really a polygon, but just the rim for the edges to attach to.
+	const newPolygon = addValue(mesh.polygons, {
+		// Not yet connected.
+		firstHalfEdgeId: -1,
+		isHole: true,
+	});
+
+	// Even a single corner needs edges and polygons.
+	const newHalfEdgeA = addValue(mesh.halfEdges, {
+		// The edge loops back.
+		cornerId: newCorner.id,
+		// The hole-polygon occupies both sides of the edge.
+		polygonId: newPolygon.id,
+
+		otherHalfId: -1,
+		nextEdgeIdAroundPolygon: -1,
+		nextEdgeIdAroundCorner: -1,
+	});
+	const newHalfEdgeB = addValue(mesh.halfEdges, {
+		cornerId: newCorner.id,
+		polygonId: newPolygon.id,
+		otherHalfId: newHalfEdgeA.id,
+
+		nextEdgeIdAroundPolygon: -1,
+		nextEdgeIdAroundCorner: -1,
+	});
+	newHalfEdgeB.otherHalfId = newHalfEdgeB.id;
+	// There is only one corner, so the next edge is itself.
+	newHalfEdgeA.nextEdgeIdAroundPolygon = newHalfEdgeA.id;
+	newHalfEdgeA.nextEdgeIdAroundCorner = newHalfEdgeA.id;
+	newHalfEdgeB.nextEdgeIdAroundPolygon = newHalfEdgeB.id;
+	newHalfEdgeB.nextEdgeIdAroundCorner = newHalfEdgeB.id;
+
+	newCorner.firstHalfEdgeId = newHalfEdgeA.id;
+	newPolygon.firstHalfEdgeId = newHalfEdgeA.id;
+
+	addValue(mesh.edges, {
+		firstHalfEdgeId: newHalfEdgeA.id,
+	});
+
+	setValue(mesh.cornerAttributes, newCorner.id, attributes);
+
+	return newCorner;
+}
 
 // export function extrudeCorner(
 // 	mesh: Mesh,

@@ -1,5 +1,6 @@
 import { TestSuite, Test, expect } from "testyts";
-import { makeEmptyMesh } from "./Mesh";
+import { Coord3 } from "./Coord3";
+import { addCorner, makeEmptyMesh } from "./Mesh";
 import { getValues } from "./Table";
 
 @TestSuite()
@@ -13,13 +14,13 @@ export class MeshTestSuite {
 		expect.toBeEqual(getValues(mesh.cornerAttributes).length, 0);
 	}
 
-	// @Test()
-	// addCorner() {
-	// 	const { mesh, position } = makeOneCornerMesh();
-	// 	expect.toBeEqual(mesh.corners.length, 1);
-	// 	expect.toBeEqual(mesh.cornerAttributes.size, 1);
-	// 	expect.toBeEqual([...mesh.cornerAttributes.values()][0].position, position);
-	// }
+	@Test()
+	addCorner() {
+		const { mesh, position } = makeOneCornerMesh();
+		expect.toBeEqual(getValues(mesh.corners).length, 1);
+		expect.toBeEqual(getValues(mesh.cornerAttributes).length, 1);
+		expect.toBeEqual(getValues(mesh.cornerAttributes)[0].position, position);
+	}
 
 	// @Test()
 	// extrudeCorner() {
@@ -53,18 +54,21 @@ export class MeshTestSuite {
 	// }
 }
 
-// function makeOneCornerMesh() {
-// 	const position = new Coord3({ x: 0, y: 0, z: 0 });
-// 	const normal = new Coord3({ x: 0, y: 0, z: 1 });
+function makeOneCornerMesh() {
+	const mesh = makeEmptyMesh();
 
-// 	return {
-// 		...addCorner(makeEmptyMesh(), {
-// 			position,
-// 			normal,
-// 		}),
-// 		position,
-// 	};
-// }
+	const position = new Coord3({ x: 0, y: 0, z: 0 });
+	const normal = new Coord3({ x: 0, y: 0, z: 1 });
+	addCorner(mesh, {
+		position,
+		normal,
+	});
+
+	return {
+		mesh: { ...mesh },
+		position,
+	};
+}
 
 // function makeOneEdgeMesh() {
 // 	const { mesh, newCorner } = makeOneCornerMesh();
