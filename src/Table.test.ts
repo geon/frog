@@ -1,5 +1,11 @@
 import { TestSuite, Test, expect } from "testyts";
-import { addValue, getValues, getValue, makeEmptyTable } from "./Table";
+import {
+	addValue,
+	getValues,
+	getValue,
+	makeEmptyTable,
+	setValue,
+} from "./Table";
 
 @TestSuite()
 export class TableTestSuite {
@@ -34,5 +40,14 @@ export class TableTestSuite {
 		const neonId = addValue(table, { value: "neon" }).id;
 		expect.toBeEqual(getValue(table, geonId).value, "geon");
 		expect.toBeEqual(getValue(table, neonId).value, "neon");
+	}
+
+	@Test()
+	setValueById() {
+		const table = makeEmptyTable<string>();
+		setValue(table, 1, "geon");
+		setValue(table, 2, "neon");
+		expect.toBeEqual(getValue(table, 1), "geon");
+		expect.toBeEqual(getValue(table, 2), "neon");
 	}
 }

@@ -34,3 +34,11 @@ export function addValue<T extends { id: TableId }>(
 export function getValue<T>(table: Table<T>, id: TableId): T {
 	return table.values[id];
 }
+
+export function setValue<T>(
+	table: MutableTable<T>,
+	id: TableId,
+	value: T,
+): void {
+	table.values[id] = value;
+}
