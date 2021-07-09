@@ -1,6 +1,6 @@
 import { TestSuite, Test, expect } from "testyts";
 import { Coord3 } from "./Coord3";
-import { addCorner, makeEmptyMesh } from "./Mesh";
+import { addCorner, getCornersOfPolygon, makeEmptyMesh } from "./Mesh";
 import { getValues } from "./Table";
 
 @TestSuite()
@@ -20,6 +20,15 @@ export class MeshTestSuite {
 		expect.toBeEqual(getValues(mesh.corners).length, 1);
 		expect.toBeEqual(getValues(mesh.cornerAttributes).length, 1);
 		expect.toBeEqual(getValues(mesh.cornerAttributes)[0].position, position);
+	}
+
+	@Test()
+	verifyMeshIntegrity() {
+		const { mesh } = makeOneCornerMesh();
+		expect.toBeEqual(
+			[...getCornersOfPolygon(mesh, getValues(mesh.polygons)[0])].length,
+			1,
+		);
 	}
 
 	// @Test()

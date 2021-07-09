@@ -1,6 +1,12 @@
 import { Coord3 } from "./Coord3";
 import { TwoDeepReadonly } from "./DeepReadonly";
-import { addValue, makeEmptyTable, MutableTable, setValue } from "./Table";
+import {
+	addValue,
+	getValue,
+	makeEmptyTable,
+	MutableTable,
+	setValue,
+} from "./Table";
 // import * as twgl from "twgl.js";
 
 type CornerId = number;
@@ -205,13 +211,15 @@ export function addCorner(
 // 	};
 // }
 
-// function* polygonCorners(polygon: Polygon) {
-// 	let halfEdge = polygon.firstEdge;
-// 	do {
-// 		yield halfEdge.corner;
-// 		halfEdge = halfEdge.nextEdgeAroundPolygon;
-// 	} while (halfEdge !== polygon.firstEdge);
-// }
+export function* getCornersOfPolygon(mesh: Mesh, polygon: Polygon) {
+	let halfEdgeId = polygon.firstHalfEdgeId;
+	do {
+		const halfEdge = getValue(mesh.halfEdges, halfEdgeId);
+		const corner = getValue(mesh.corners, halfEdge.cornerId);
+		yield corner;
+		halfEdgeId = halfEdge.nextEdgeIdAroundPolygon;
+	} while (halfEdgeId !== polygon.firstHalfEdgeId);
+}
 
 // function polygonToWebglArrays(mesh: Mesh, polygon: Polygon) {
 // 	const corners = [...polygonCorners(polygon)];

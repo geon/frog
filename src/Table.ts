@@ -31,7 +31,7 @@ export function addValue<T extends { id: TableId }>(
 	return valueAsT;
 }
 
-export function getValue<T>(table: Table<T>, id: TableId): T {
+export function getValue<T>(table: Table<T>, id: TableId): Readonly<T> {
 	return table.values[id];
 }
 
