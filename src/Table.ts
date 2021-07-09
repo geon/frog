@@ -9,7 +9,7 @@ export interface MutableTable<T> {
 
 export type Table<T> = TwoDeepReadonly<MutableTable<T>>;
 
-export function makeEmptyTable<T>(): Table<T> {
+export function makeEmptyTable<T>(): MutableTable<T> {
 	return {
 		nextId: 0,
 		values: {},
@@ -20,11 +20,15 @@ export function getValues<T>(table: Table<T>): readonly T[] {
 	return Object.values(table.values);
 }
 
-export function addValue<T>(table: MutableTable<T>, value: T): TableId {
+export function addValue<T extends { id: TableId }>(
+	table: MutableTable<T>,
+	value: Omit<T, "id">,
+): T {
 	const id = table.nextId;
 	table.nextId++;
-	table.values[id] = value;
-	return id;
+	const valueAsT = { ...value, id } as T;
+	table.values[id] = valueAsT;
+	return valueAsT;
 }
 
 export function getValue<T>(table: Table<T>, id: TableId): T {

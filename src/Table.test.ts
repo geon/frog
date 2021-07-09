@@ -11,25 +11,28 @@ export class TableTestSuite {
 
 	@Test()
 	addValueToTable() {
-		const table = makeEmptyTable<string>();
-		addValue(table, "geon");
-		expect.arraysToBeEqual(getValues(table) as any, ["geon"]);
+		const table = makeEmptyTable<{ id: number; value: string }>();
+		addValue(table, { value: "geon" });
+		expect.toBeEqual(getValues(table)[0].value, "geon");
 	}
 
 	@Test()
 	addValuesToTable() {
-		const table = makeEmptyTable<string>();
-		addValue(table, "geon");
-		addValue(table, "neon");
-		expect.arraysToBeEqual(getValues(table) as any, ["geon", "neon"]);
+		const table = makeEmptyTable<{ id: number; value: string }>();
+		addValue(table, { value: "geon" });
+		addValue(table, { value: "neon" });
+		expect.arraysToBeEqual(
+			getValues(table).map((x) => x.value),
+			["geon", "neon"],
+		);
 	}
 
 	@Test()
 	getValueById() {
-		const table = makeEmptyTable<string>();
-		const geonId = addValue(table, "geon");
-		const neonId = addValue(table, "neon");
-		expect.toBeEqual(getValue(table, geonId), "geon");
-		expect.toBeEqual(getValue(table, neonId), "neon");
+		const table = makeEmptyTable<{ id: number; value: string }>();
+		const geonId = addValue(table, { value: "geon" }).id;
+		const neonId = addValue(table, { value: "neon" }).id;
+		expect.toBeEqual(getValue(table, geonId).value, "geon");
+		expect.toBeEqual(getValue(table, neonId).value, "neon");
 	}
 }
