@@ -1,12 +1,7 @@
 import { Coord3 } from "./Coord3";
-import { TwoDeepReadonly } from "./DeepReadonly";
-import {
-	addValue,
-	getValue,
-	makeEmptyTable,
-	MutableTable,
-	setValue,
-} from "./Table";
+// import { TwoDeepReadonly } from "./DeepReadonly";
+import { makeMutable, TwoDeepMutable } from "./Mutable";
+import { addValue, getValue, makeEmptyTable, setValue, Table } from "./Table";
 // import * as twgl from "twgl.js";
 
 type CornerId = number;
@@ -42,27 +37,27 @@ export interface HalfEdge {
 	nextEdgeIdAroundCorner: HalfEdgeId;
 }
 
-export interface MutableMesh {
-	corners: MutableTable<Corner>;
-	edges: MutableTable<Edge>;
-	polygons: MutableTable<Polygon>;
-	halfEdges: MutableTable<HalfEdge>;
-	cornerAttributes: MutableTable<{
+export interface Mesh {
+	readonly corners: Table<Corner>;
+	readonly edges: Table<Edge>;
+	readonly polygons: Table<Polygon>;
+	readonly halfEdges: Table<HalfEdge>;
+	readonly cornerAttributes: Table<{
 		position: Coord3;
 		normal: Coord3;
 	}>;
 }
 
-export type Mesh = TwoDeepReadonly<MutableMesh>;
+export type MutableMesh = TwoDeepMutable<Mesh>;
 
-export function makeEmptyMesh(): Mesh {
-	return {
+export function makeEmptyMesh(): MutableMesh {
+	return makeMutable({
 		corners: makeEmptyTable(),
 		edges: makeEmptyTable(),
 		polygons: makeEmptyTable(),
 		halfEdges: makeEmptyTable(),
 		cornerAttributes: makeEmptyTable(),
-	};
+	});
 }
 
 export function addCorner(

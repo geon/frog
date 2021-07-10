@@ -74,7 +74,7 @@ function makeOneCornerMesh() {
 	});
 
 	return {
-		mesh: { ...mesh },
+		mesh,
 		position,
 	};
 }

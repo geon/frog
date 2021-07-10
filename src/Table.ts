@@ -1,19 +1,20 @@
-import { TwoDeepReadonly } from "./DeepReadonly";
+// import { TwoDeepReadonly } from "./DeepReadonly";
+import { makeMutable, Mutable } from "./Mutable";
 
 export type TableId = number;
 
-export interface MutableTable<T> {
-	nextId: TableId;
-	values: Record<TableId, T>;
+export interface Table<T> {
+	readonly nextId: TableId;
+	readonly values: Record<TableId, T>;
 }
 
-export type Table<T> = TwoDeepReadonly<MutableTable<T>>;
+export type MutableTable<T> = Mutable<Table<T>>;
 
 export function makeEmptyTable<T>(): MutableTable<T> {
-	return {
+	return makeMutable({
 		nextId: 0,
 		values: {},
-	};
+	});
 }
 
 export function getValues<T>(table: Table<T>): readonly T[] {
