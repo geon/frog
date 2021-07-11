@@ -33,17 +33,17 @@ export class MeshTestSuite {
 
 	// @Test()
 	// extrudeCorner() {
-	// 	let { mesh } = makeOneEdgeMesh();
-	// 	expect.toBeEqual(mesh.halfEdges.length, 2);
-	// 	expect.toBeEqual(mesh.halfEdges[0].polygon, undefined);
-	// 	expect.toBeEqual(mesh.halfEdges[1].polygon, undefined);
+	// 	const mesh = makeOneEdgeMesh();
+	// 	expect.toBeEqual(getValues(mesh.halfEdges).length, 2);
+	// 	expect.toBeEqual(getValues(mesh.halfEdges)[0].polygonId, undefined);
+	// 	expect.toBeEqual(getValues(mesh.halfEdges)[1].polygonId, undefined);
 	// 	expect.toBeEqual(
-	// 		mesh.halfEdges[0].nextEdgeAroundPolygon,
-	// 		mesh.halfEdges[1],
+	// 		getValues(mesh.halfEdges)[0].nextEdgeIdAroundPolygon,
+	// 		getValues(mesh.halfEdges)[1].id,
 	// 	);
 	// 	expect.toBeEqual(
-	// 		mesh.halfEdges[1].nextEdgeAroundPolygon,
-	// 		mesh.halfEdges[0],
+	// 		getValues(mesh.halfEdges)[1].nextEdgeIdAroundPolygon,
+	// 		getValues(mesh.halfEdges)[0].id,
 	// 	);
 	// }
 
@@ -68,7 +68,7 @@ function makeOneCornerMesh() {
 
 	const position = new Coord3({ x: 0, y: 0, z: 0 });
 	const normal = new Coord3({ x: 0, y: 0, z: 1 });
-	addCorner(mesh, {
+	const corner = addCorner(mesh, {
 		position,
 		normal,
 	});
@@ -76,10 +76,12 @@ function makeOneCornerMesh() {
 	return {
 		mesh,
 		position,
+		corner,
 	};
 }
 
 // function makeOneEdgeMesh() {
-// 	const { mesh, newCorner } = makeOneCornerMesh();
-// 	return extrudeCorner(mesh, newCorner, new Coord3({ x: 1, y: 0, z: 0 }));
+// 	const { mesh, corner } = makeOneCornerMesh();
+// 	extrudeCorner(mesh, corner, new Coord3({ x: 1, y: 0, z: 0 }));
+// 	return mesh;
 // }

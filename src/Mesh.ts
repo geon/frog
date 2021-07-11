@@ -115,39 +115,46 @@ export function addCorner(
 }
 
 // export function extrudeCorner(
-// 	mesh: Mesh,
+// 	mesh: MutableMesh,
 // 	corner: Corner,
 // 	offset: Coord3,
-// ): { mesh: Mesh; newHalfEdges: HalfEdge[] } {
-// 	const oldCornerAttributes = mesh.cornerAttributes.get(corner)!;
-
-// 	const { newCorner, ...rest } = addCorner(mesh, {
-// 		...oldCornerAttributes,
-// 		position: Coord3.add(oldCornerAttributes.position, offset),
-// 	});
-// 	mesh = rest.mesh;
-
-// 	const halfEdgeA: HalfEdge = {
-// 		corner: corner,
-// 		// The othe edge does not exist yet.
-// 		otherHalf: undefined!,
-// 		nextEdgeAroundPolygon: undefined!,
-// 	};
-// 	const halfEdgeB: HalfEdge = {
-// 		corner: newCorner,
-// 		otherHalf: halfEdgeA!,
-// 		nextEdgeAroundPolygon: halfEdgeA,
-// 	};
-// 	// Now it exists.
-// 	halfEdgeA.otherHalf = halfEdgeB;
-// 	halfEdgeA.nextEdgeAroundPolygon = halfEdgeB;
-
-// 	const newHalfEdges = [halfEdgeA, halfEdgeB];
-
-// 	return {
-// 		mesh: { ...mesh, halfEdges: [...mesh.halfEdges, ...newHalfEdges] },
-// 		newHalfEdges,
-// 	};
+// ) {
+// const oldCornerAttributes = getValue(mesh.cornerAttributes, corner.id);
+// const newCorner = addCorner(mesh, {
+// 	...oldCornerAttributes,
+// 	position: Coord3.add(oldCornerAttributes.position, offset),
+// });
+// const halfEdgeA = addValue(mesh.halfEdges, {
+// 	cornerId: corner.id,
+// 	polygonId: -1,
+// 	// The othe edge does not exist yet.
+// 	otherHalfId: -1,
+// 	nextEdgeIdAroundPolygon: -1,
+// 	nextEdgeIdAroundCorner: -1,
+// });
+// const halfEdgeB = addValue(mesh.halfEdges, {
+// 	cornerId: newCorner.id,
+// 	polygonId: -1,
+// 	otherHalfId: halfEdgeA.id,
+// 	nextEdgeIdAroundPolygon: halfEdgeA.id,
+// 	nextEdgeIdAroundCorner: halfEdgeA.id,
+// });
+// // Now it exists.
+// halfEdgeA.otherHalfId = halfEdgeB.id;
+// halfEdgeA.nextEdgeIdAroundPolygon = halfEdgeB.id;
+// const newHalfEdges = [halfEdgeA, halfEdgeB];
+// return newHalfEdges;
+//
+//
+// const newCorner = addValue(mesh.corners, {
+// 	// Not yet connected.
+// 	firstHalfEdgeId: -1,
+// });
+// const oldCornerAttributes = getValue(mesh.cornerAttributes, corner.id);
+// setValue(mesh.cornerAttributes, newCorner.id, {
+// 	...oldCornerAttributes,
+// 	position: Coord3.add(oldCornerAttributes.position, offset),
+// });
 // }
 
 // export function makeTestMesh(): Mesh {
