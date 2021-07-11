@@ -60,58 +60,78 @@ export function makeEmptyMesh(): MutableMesh {
 	});
 }
 
-export function addCorner(
+export function addEdges(
 	mesh: MutableMesh,
-	attributes: { position: Coord3; normal: Coord3 },
-): Corner {
-	const newCorner = addValue(mesh.corners, {
-		// Not yet connected.
-		firstHalfEdgeId: -1,
+	cornerAttributes: { position: Coord3; normal: Coord3 }[],
+) {
+	if (cornerAttributes.length < 2) {
+		throw new Error("An edge must have at least 2 corners.");
+	}
+
+	const newCorners = cornerAttributes.map((attributes) => {
+		const corner = addValue(mesh.corners, {
+			// Not yet connected.
+			firstHalfEdgeId: -1,
+		});
+		setValue(mesh.cornerAttributes, corner.id, attributes);
+		return corner;
 	});
 
-	// This is  not really a polygon, but just the rim for the edges to attach to.
+	// This is not really a polygon, but just the rim for the edge to attach to.
 	const newPolygon = addValue(mesh.polygons, {
 		// Not yet connected.
 		firstHalfEdgeId: -1,
 		isHole: true,
 	});
 
-	// Even a single corner needs edges and polygons.
-	const newHalfEdgeA = addValue(mesh.halfEdges, {
-		// The edge loops back.
-		cornerId: newCorner.id,
-		// The hole-polygon occupies both sides of the edge.
-		polygonId: newPolygon.id,
+	// .slice(0, -1) => All but the last.
+	const halfEdgesA = newCorners.slice(0, -1).map((newCorner) =>
+		addValue(mesh.halfEdges, {
+			cornerId: newCorner.id,
+			polygonId: newPolygon.id,
+			otherHalfId: -1,
+			nextEdgeIdAroundPolygon: -1,
+			nextEdgeIdAroundCorner: -1,
+		}),
+	);
+	// .slice(1) => All but the first.
+	const halfEdgesB = newCorners.slice(1).map((newCorner) =>
+		addValue(mesh.halfEdges, {
+			cornerId: newCorner.id,
+			polygonId: newPolygon.id,
+			otherHalfId: -1,
+			nextEdgeIdAroundPolygon: -1,
+			nextEdgeIdAroundCorner: -1,
+		}),
+	);
+	for (const index of halfEdgesA.map((_, index) => index)) {
+		const halfEdgeA = halfEdgesA[index];
+		const halfEdgeB = halfEdgesB[index];
 
-		otherHalfId: -1,
-		nextEdgeIdAroundPolygon: -1,
-		nextEdgeIdAroundCorner: -1,
+		halfEdgeA.otherHalfId = halfEdgeB.id;
+		halfEdgeB.otherHalfId = halfEdgeA.id;
+
+		halfEdgeA.nextEdgeIdAroundPolygon = (
+			halfEdgesA[index - 1] ?? halfEdgesB[index]
+		).id;
+		halfEdgeB.nextEdgeIdAroundPolygon = (
+			halfEdgesB[index + 1] ?? halfEdgesA[index]
+		).id;
+	}
+
+	newCorners.forEach((newCorner, index) => {
+		const halfEdge = halfEdgesA[index] ?? halfEdgesB[index - 1];
+		newCorner.firstHalfEdgeId = halfEdge.id;
+		newPolygon.firstHalfEdgeId = halfEdge.id;
 	});
-	const newHalfEdgeB = addValue(mesh.halfEdges, {
-		cornerId: newCorner.id,
-		polygonId: newPolygon.id,
-		otherHalfId: newHalfEdgeA.id,
 
-		nextEdgeIdAroundPolygon: -1,
-		nextEdgeIdAroundCorner: -1,
-	});
-	newHalfEdgeB.otherHalfId = newHalfEdgeB.id;
-	// There is only one corner, so the next edge is itself.
-	newHalfEdgeA.nextEdgeIdAroundPolygon = newHalfEdgeA.id;
-	newHalfEdgeA.nextEdgeIdAroundCorner = newHalfEdgeA.id;
-	newHalfEdgeB.nextEdgeIdAroundPolygon = newHalfEdgeB.id;
-	newHalfEdgeB.nextEdgeIdAroundCorner = newHalfEdgeB.id;
-
-	newCorner.firstHalfEdgeId = newHalfEdgeA.id;
-	newPolygon.firstHalfEdgeId = newHalfEdgeA.id;
-
-	addValue(mesh.edges, {
-		firstHalfEdgeId: newHalfEdgeA.id,
+	halfEdgesA.forEach((halfEdge) => {
+		addValue(mesh.edges, {
+			firstHalfEdgeId: halfEdge.id,
+		});
 	});
 
-	setValue(mesh.cornerAttributes, newCorner.id, attributes);
-
-	return newCorner;
+	return newCorners;
 }
 
 // export function extrudeCorner(

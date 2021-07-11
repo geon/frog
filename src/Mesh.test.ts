@@ -1,6 +1,6 @@
 import { TestSuite, Test, expect } from "testyts";
 import { Coord3 } from "./Coord3";
-import { addCorner, getCornersOfPolygon, makeEmptyMesh } from "./Mesh";
+import { addEdges, getCornersOfPolygon, makeEmptyMesh } from "./Mesh";
 import { getValues } from "./Table";
 
 @TestSuite()
@@ -15,19 +15,18 @@ export class MeshTestSuite {
 	}
 
 	@Test()
-	addCorner() {
-		const { mesh, position } = makeOneCornerMesh();
-		expect.toBeEqual(getValues(mesh.corners).length, 1);
-		expect.toBeEqual(getValues(mesh.cornerAttributes).length, 1);
-		expect.toBeEqual(getValues(mesh.cornerAttributes)[0].position, position);
+	addEdge() {
+		const { mesh } = makeOneEdgeMesh();
+		expect.toBeEqual(getValues(mesh.corners).length, 2);
+		expect.toBeEqual(getValues(mesh.cornerAttributes).length, 2);
 	}
 
 	@Test()
 	verifyMeshIntegrity() {
-		const { mesh } = makeOneCornerMesh();
+		const { mesh } = makeOneEdgeMesh();
 		expect.toBeEqual(
 			[...getCornersOfPolygon(mesh, getValues(mesh.polygons)[0])].length,
-			1,
+			2,
 		);
 	}
 
@@ -63,20 +62,26 @@ export class MeshTestSuite {
 	// }
 }
 
-function makeOneCornerMesh() {
+function makeOneEdgeMesh() {
 	const mesh = makeEmptyMesh();
 
-	const position = new Coord3({ x: 0, y: 0, z: 0 });
+	const positions = [
+		new Coord3({ x: -1, y: 0, z: 0 }),
+		new Coord3({ x: 1, y: 0, z: 0 }),
+	];
 	const normal = new Coord3({ x: 0, y: 0, z: 1 });
-	const corner = addCorner(mesh, {
-		position,
-		normal,
-	});
+
+	const edge = addEdges(
+		mesh,
+		positions.map((position) => ({
+			position,
+			normal,
+		})),
+	);
 
 	return {
 		mesh,
-		position,
-		corner,
+		edge,
 	};
 }
 
