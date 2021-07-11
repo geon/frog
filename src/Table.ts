@@ -33,6 +33,10 @@ export function addValue<T extends { id: TableId }>(
 }
 
 export function getValue<T>(table: Table<T>, id: TableId): Readonly<T> {
+	const value = table.values[id];
+	if (!value) {
+		throw new Error("Bad id: " + id);
+	}
 	return table.values[id];
 }
 
