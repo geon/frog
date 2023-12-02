@@ -1,66 +1,59 @@
-import { TestSuite, Test, expect } from "testyts";
+import { expect, test } from "vitest";
 import { Coord3 } from "./Coord3";
 import { addEdges, getCornersOfPolygon, makeEmptyMesh } from "./Mesh";
 import { getValues } from "./Table";
 
-@TestSuite()
-export class MeshTestSuite {
-	@Test()
-	makeEmptyMesh() {
-		const mesh = makeEmptyMesh();
-		expect.toBeEqual(getValues(mesh.halfEdges).length, 0);
-		expect.toBeEqual(getValues(mesh.polygons).length, 0);
-		expect.toBeEqual(getValues(mesh.corners).length, 0);
-		expect.toBeEqual(getValues(mesh.cornerAttributes).length, 0);
-	}
+test("makeEmptyMesh", () => {
+	const mesh = makeEmptyMesh();
+	expect(getValues(mesh.halfEdges).length).toBe(0);
+	expect(getValues(mesh.polygons).length).toBe(0);
+	expect(getValues(mesh.corners).length).toBe(0);
+	expect(getValues(mesh.cornerAttributes).length).toBe(0);
+});
 
-	@Test()
-	addEdge() {
-		const { mesh } = makeOneEdgeMesh();
-		expect.toBeEqual(getValues(mesh.corners).length, 2);
-		expect.toBeEqual(getValues(mesh.cornerAttributes).length, 2);
-	}
+test("addEdge", () => {
+	const { mesh } = makeOneEdgeMesh();
+	expect(getValues(mesh.corners).length).toBe(2);
+	expect(getValues(mesh.cornerAttributes).length).toBe(2);
+});
 
-	@Test()
-	verifyMeshIntegrity() {
-		const { mesh } = makeOneEdgeMesh();
-		expect.toBeEqual(
-			[...getCornersOfPolygon(mesh, getValues(mesh.polygons)[0])].length,
-			2,
-		);
-	}
+test("verifyMeshIntegrity", () => {
+	const { mesh } = makeOneEdgeMesh();
+	expect(
+		[...getCornersOfPolygon(mesh, getValues(mesh.polygons)[0])].length,
+	).toBe(2);
+});
 
-	// @Test()
-	// extrudeCorner() {
-	// 	const mesh = makeOneEdgeMesh();
-	// 	expect.toBeEqual(getValues(mesh.halfEdges).length, 2);
-	// 	expect.toBeEqual(getValues(mesh.halfEdges)[0].polygonId, undefined);
-	// 	expect.toBeEqual(getValues(mesh.halfEdges)[1].polygonId, undefined);
-	// 	expect.toBeEqual(
-	// 		getValues(mesh.halfEdges)[0].nextEdgeIdAroundPolygon,
-	// 		getValues(mesh.halfEdges)[1].id,
-	// 	);
-	// 	expect.toBeEqual(
-	// 		getValues(mesh.halfEdges)[1].nextEdgeIdAroundPolygon,
-	// 		getValues(mesh.halfEdges)[0].id,
-	// 	);
-	// }
+// @Test()
+// extrudeCorner() {
+// 	const mesh = makeOneEdgeMesh();
+// 	expect(getValues(mesh.halfEdges).length, 2);
+// 	expect(getValues(mesh.halfEdges)[0].polygonId, undefined);
+// 	expect(getValues(mesh.halfEdges)[1].polygonId, undefined);
+// 	expect(
+// 		getValues(mesh.halfEdges)[0].nextEdgeIdAroundPolygon,
+// 		getValues(mesh.halfEdges)[1].id,
+// 	);
+// 	expect(
+// 		getValues(mesh.halfEdges)[1].nextEdgeIdAroundPolygon,
+// 		getValues(mesh.halfEdges)[0].id,
+// 	);
+// }
 
-	// @Test()
-	// extrudeCornerOnEdge() {
-	// 	const oneEdgeResult = makeOneEdgeMesh();
-	// 	let { mesh, newHalfEdges } = extrudeCorner(
-	// 		oneEdgeResult.mesh,
-	// 		oneEdgeResult.mesh.corners[1],
-	// 		new Coord3({ x: 1, y: 0, z: 0 }),
-	// 	);
-	// 	expect.toBeEqual(mesh.halfEdges.length, 4);
-	// 	expect.toBeEqual(newHalfEdges[0].polygon, undefined);
-	// 	expect.toBeEqual(newHalfEdges[1].polygon, undefined);
-	// 	expect.toBeEqual(newHalfEdges[0].nextEdgeAroundPolygon, newHalfEdges[1]);
-	// 	expect.toBeEqual(newHalfEdges[1].nextEdgeAroundPolygon, newHalfEdges[0]);
-	// }
-}
+// @Test()
+// extrudeCornerOnEdge() {
+// 	const oneEdgeResult = makeOneEdgeMesh();
+// 	let { mesh, newHalfEdges } = extrudeCorner(
+// 		oneEdgeResult.mesh,
+// 		oneEdgeResult.mesh.corners[1],
+// 		new Coord3({ x: 1, y: 0, z: 0 }),
+// 	);
+// 	expect(mesh.halfEdges.length, 4);
+// 	expect(newHalfEdges[0].polygon, undefined);
+// 	expect(newHalfEdges[1].polygon, undefined);
+// 	expect(newHalfEdges[0].nextEdgeAroundPolygon, newHalfEdges[1]);
+// 	expect(newHalfEdges[1].nextEdgeAroundPolygon, newHalfEdges[0]);
+// }
 
 function makeOneEdgeMesh() {
 	const mesh = makeEmptyMesh();
@@ -69,13 +62,11 @@ function makeOneEdgeMesh() {
 		new Coord3({ x: -1, y: 0, z: 0 }),
 		new Coord3({ x: 1, y: 0, z: 0 }),
 	];
-	const normal = new Coord3({ x: 0, y: 0, z: 1 });
 
 	const edge = addEdges(
 		mesh,
 		positions.map((position) => ({
 			position,
-			normal,
 		})),
 	);
 

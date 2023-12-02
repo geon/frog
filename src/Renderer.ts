@@ -1,5 +1,5 @@
 import * as twgl from "twgl.js";
-import { Mesh, meshToWebglArrays } from "./Mesh";
+// import { Mesh, meshToWebglArrays } from "./Mesh";
 import { vertexShader, fragmentShader } from "./shaders";
 
 export class Renderer {
@@ -41,11 +41,11 @@ export class Renderer {
 		this.clear();
 	}
 
-	addMesh(mesh: Mesh) {
-		this.bufferInfos.push(
-			twgl.createBufferInfoFromArrays(this.gl, meshToWebglArrays(mesh)),
-		);
-	}
+	// addMesh(mesh: Mesh) {
+	// 	this.bufferInfos.push(
+	// 		twgl.createBufferInfoFromArrays(this.gl, meshToWebglArrays(mesh)),
+	// 	);
+	// }
 
 	clear() {
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);

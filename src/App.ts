@@ -67,7 +67,7 @@ export class App {
 
 	addMesh(mesh: Mesh) {
 		this.meshes.push(mesh);
-		this.renderer.addMesh(mesh);
+		// this.renderer.addMesh(mesh);
 	}
 
 	draw() {

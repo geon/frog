@@ -44,7 +44,6 @@ export interface Mesh {
 	readonly halfEdges: Table<HalfEdge>;
 	readonly cornerAttributes: Table<{
 		position: Coord3;
-		normal: Coord3;
 	}>;
 }
 
@@ -62,7 +61,7 @@ export function makeEmptyMesh(): MutableMesh {
 
 export function addEdges(
 	mesh: MutableMesh,
-	cornerAttributes: { position: Coord3; normal: Coord3 }[],
+	cornerAttributes: { position: Coord3 }[],
 ) {
 	if (cornerAttributes.length < 2) {
 		throw new Error("An edge must have at least 2 corners.");
