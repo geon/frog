@@ -13,12 +13,16 @@ export interface HalfEdge {
 export class Mesh {
 	constructor() {}
 
-	static cornerEdgeCount(corner: Corner): number {
+	static cornerEdgeCount(corner: Corner): number | undefined {
 		let count = 0;
 		let halfEdge = corner.firstHalfEdge;
 		do {
 			halfEdge = halfEdge.next;
 			++count;
+			// This is an arbitrary limit. Prevent acyclics graphs from crashing.
+			if (count > 1000) {
+				return undefined;
+			}
 		} while (halfEdge !== corner.firstHalfEdge);
 		return count;
 	}

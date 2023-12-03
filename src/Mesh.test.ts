@@ -39,3 +39,22 @@ test("cornerEdgeCount 2", () => {
 
 	expect(Mesh.cornerEdgeCount(corner)).toBe(2);
 });
+
+test("cornerEdgeCount acyclic", () => {
+	const corner: Corner = {
+		position: new Coord3({ x: 0, y: 0, z: 0 }),
+		firstHalfEdge: null!,
+	};
+	const halfEdgeA: HalfEdge = {
+		next: null!,
+	};
+	const halfEdgeB: HalfEdge = {
+		next: null!,
+	};
+
+	corner.firstHalfEdge = halfEdgeA;
+	halfEdgeA.next = halfEdgeB;
+	halfEdgeB.next = halfEdgeB;
+
+	expect(Mesh.cornerEdgeCount(corner)).toBe(undefined);
+});
