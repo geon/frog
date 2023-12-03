@@ -1,8 +1,6 @@
 import { Coord3 } from "./Coord3";
-// import { TwoDeepReadonly } from "./DeepReadonly";
 import { makeMutable, TwoDeepMutable } from "./Mutable";
 import { addValue, getValue, makeEmptyTable, setValue, Table } from "./Table";
-// import * as twgl from "twgl.js";
 
 type CornerId = number;
 type EdgeId = number;
@@ -12,6 +10,7 @@ type HalfEdgeId = number;
 export interface Corner {
 	id: CornerId;
 	firstHalfEdgeId: HalfEdgeId;
+	position: Coord3;
 }
 
 export interface Edge {
@@ -42,9 +41,6 @@ export interface Mesh {
 	readonly edges: Table<Edge>;
 	readonly polygons: Table<Polygon>;
 	readonly halfEdges: Table<HalfEdge>;
-	readonly cornerAttributes: Table<{
-		position: Coord3;
-	}>;
 }
 
 export type MutableMesh = TwoDeepMutable<Mesh>;
@@ -59,20 +55,17 @@ export function makeEmptyMesh(): MutableMesh {
 	});
 }
 
-export function addEdges(
-	mesh: MutableMesh,
-	cornerAttributes: { position: Coord3 }[],
-) {
-	if (cornerAttributes.length < 2) {
+export function addEdges(mesh: MutableMesh, newCornerPositions: Coord3[]) {
+	if (newCornerPositions.length < 2) {
 		throw new Error("An edge must have at least 2 corners.");
 	}
 
-	const newCorners = cornerAttributes.map((attributes) => {
+	const newCorners = newCornerPositions.map((position) => {
 		const corner = addValue(mesh.corners, {
 			// Not yet connected.
 			firstHalfEdgeId: -1,
+			position,
 		});
-		setValue(mesh.cornerAttributes, corner.id, attributes);
 		return corner;
 	});
 

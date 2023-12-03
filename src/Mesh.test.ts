@@ -8,13 +8,11 @@ test("makeEmptyMesh", () => {
 	expect(getValues(mesh.halfEdges).length).toBe(0);
 	expect(getValues(mesh.polygons).length).toBe(0);
 	expect(getValues(mesh.corners).length).toBe(0);
-	expect(getValues(mesh.cornerAttributes).length).toBe(0);
 });
 
 test("addEdge", () => {
 	const { mesh } = makeOneEdgeMesh();
 	expect(getValues(mesh.corners).length).toBe(2);
-	expect(getValues(mesh.cornerAttributes).length).toBe(2);
 });
 
 test("verifyMeshIntegrity", () => {
@@ -63,12 +61,7 @@ function makeOneEdgeMesh() {
 		new Coord3({ x: 1, y: 0, z: 0 }),
 	];
 
-	const edge = addEdges(
-		mesh,
-		positions.map((position) => ({
-			position,
-		})),
-	);
+	const edge = addEdges(mesh, positions);
 
 	return {
 		mesh,
