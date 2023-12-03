@@ -158,3 +158,11 @@ test("polygonEdgeCount broken", () => {
 
 	expect(Mesh.polygonEdgeCount(polygonA)).toBe(undefined);
 });
+
+test("makeSquare/isValid", () => {
+	const mesh = Mesh.makeSquare();
+	expect(mesh.corners.length).toBe(4);
+	expect(mesh.polygons.length).toBe(2);
+	expect(mesh.halfEdges.length).toBe(8);
+	expect(mesh.isValid()).toBe(true);
+});
