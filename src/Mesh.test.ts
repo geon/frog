@@ -166,3 +166,9 @@ test("makeSquare/isValid", () => {
 	expect(mesh.halfEdges.length).toBe(8);
 	expect(mesh.isValid()).toBe(true);
 });
+
+test("polygonHalfEdges", () => {
+	const mesh = Mesh.makeSquare();
+	const polygonHalfEdges = Mesh.polygonHalfEdges(mesh.polygons[0]!);
+	expect(polygonHalfEdges.length).toBe(4);
+});

@@ -167,4 +167,14 @@ export class Mesh {
 		} while (halfEdge !== polygon.firstHalfEdge);
 		return count;
 	}
+
+	static polygonHalfEdges(polygon: Polygon): Array<HalfEdge> {
+		const polygonHalfEdges: Array<HalfEdge> = [];
+		let halfEdge = polygon.firstHalfEdge;
+		do {
+			halfEdge = halfEdge.twin.next;
+			polygonHalfEdges.push(halfEdge);
+		} while (halfEdge !== polygon.firstHalfEdge);
+		return polygonHalfEdges;
+	}
 }
