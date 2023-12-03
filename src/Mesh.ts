@@ -1,6 +1,6 @@
 import { Coord3 } from "./Coord3";
 import { makeMutable, TwoDeepMutable } from "./Mutable";
-import { addValue, getValue, makeEmptyTable, setValue, Table } from "./Table";
+import { addValue, getValue, makeEmptyTable, Table } from "./Table";
 
 type CornerId = number;
 type EdgeId = number;
@@ -126,48 +126,42 @@ export function addEdges(mesh: MutableMesh, newCornerPositions: Coord3[]) {
 	return newCorners;
 }
 
-// export function extrudeCorner(
-// 	mesh: MutableMesh,
-// 	corner: Corner,
-// 	offset: Coord3,
-// ) {
-// const oldCornerAttributes = getValue(mesh.cornerAttributes, corner.id);
-// const newCorner = addCorner(mesh, {
-// 	...oldCornerAttributes,
-// 	position: Coord3.add(oldCornerAttributes.position, offset),
-// });
-// const halfEdgeA = addValue(mesh.halfEdges, {
-// 	cornerId: corner.id,
-// 	polygonId: -1,
-// 	// The othe edge does not exist yet.
-// 	otherHalfId: -1,
-// 	nextEdgeIdAroundPolygon: -1,
-// 	nextEdgeIdAroundCorner: -1,
-// });
-// const halfEdgeB = addValue(mesh.halfEdges, {
-// 	cornerId: newCorner.id,
-// 	polygonId: -1,
-// 	otherHalfId: halfEdgeA.id,
-// 	nextEdgeIdAroundPolygon: halfEdgeA.id,
-// 	nextEdgeIdAroundCorner: halfEdgeA.id,
-// });
-// // Now it exists.
-// halfEdgeA.otherHalfId = halfEdgeB.id;
-// halfEdgeA.nextEdgeIdAroundPolygon = halfEdgeB.id;
-// const newHalfEdges = [halfEdgeA, halfEdgeB];
-// return newHalfEdges;
-//
-//
-// const newCorner = addValue(mesh.corners, {
-// 	// Not yet connected.
-// 	firstHalfEdgeId: -1,
-// });
-// const oldCornerAttributes = getValue(mesh.cornerAttributes, corner.id);
-// setValue(mesh.cornerAttributes, newCorner.id, {
-// 	...oldCornerAttributes,
-// 	position: Coord3.add(oldCornerAttributes.position, offset),
-// });
-// }
+export function extrudeCorner(mesh: MutableMesh, corner: Corner) {
+	const newCorner = addValue(mesh.corners, {
+		...corner,
+		position: corner.position,
+	});
+	const halfEdgeA = addValue(mesh.halfEdges, {
+		cornerId: corner.id,
+		polygonId: -1,
+		// The other halfEdge doesn't exist yet.
+		otherHalfId: -1,
+		nextEdgeIdAroundPolygon: -1,
+		nextEdgeIdAroundCorner: -1,
+	});
+	const halfEdgeB = addValue(mesh.halfEdges, {
+		cornerId: newCorner.id,
+		polygonId: -1,
+		otherHalfId: halfEdgeA.id,
+		nextEdgeIdAroundPolygon: halfEdgeA.id,
+		nextEdgeIdAroundCorner: halfEdgeA.id,
+	});
+	// Now it exists.
+	halfEdgeA.otherHalfId = halfEdgeB.id;
+	halfEdgeA.nextEdgeIdAroundPolygon = halfEdgeB.id;
+	const newHalfEdges = [halfEdgeA, halfEdgeB];
+
+	// This is not really a polygon, but just the rim for the edge to attach to.
+	const newPolygon = addValue(mesh.polygons, {
+		// Not yet connected.
+		firstHalfEdgeId: halfEdgeA.id,
+		isHole: true,
+	});
+	halfEdgeA.polygonId = newPolygon.id;
+	halfEdgeB.polygonId = newPolygon.id;
+
+	return { newHalfEdges, newPolygon };
+}
 
 // export function makeTestMesh(): Mesh {
 // 	return makeEmptyMesh();
