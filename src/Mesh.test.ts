@@ -6,15 +6,19 @@ test("new Mesh", () => {
 	new Mesh();
 });
 
+function makeDisconnectedHalfEdge(): HalfEdge {
+	return {
+		corner: null!,
+		next: null!,
+	};
+}
+
 test("cornerEdgeCount 1", () => {
 	const corner: Corner = {
 		position: new Coord3({ x: 0, y: 0, z: 0 }),
 		firstHalfEdge: null!,
 	};
-	const halfEdge: HalfEdge = {
-		corner: undefined!,
-		next: undefined!,
-	};
+	const halfEdge = makeDisconnectedHalfEdge();
 
 	corner.firstHalfEdge = halfEdge;
 	halfEdge.corner = corner;
@@ -28,14 +32,8 @@ test("cornerEdgeCount 2", () => {
 		position: new Coord3({ x: 0, y: 0, z: 0 }),
 		firstHalfEdge: null!,
 	};
-	const halfEdgeA: HalfEdge = {
-		corner: null!,
-		next: null!,
-	};
-	const halfEdgeB: HalfEdge = {
-		corner: null!,
-		next: null!,
-	};
+	const halfEdgeA = makeDisconnectedHalfEdge();
+	const halfEdgeB = makeDisconnectedHalfEdge();
 
 	corner.firstHalfEdge = halfEdgeA;
 	halfEdgeA.corner = corner;
@@ -51,14 +49,8 @@ test("cornerEdgeCount acyclic", () => {
 		position: new Coord3({ x: 0, y: 0, z: 0 }),
 		firstHalfEdge: null!,
 	};
-	const halfEdgeA: HalfEdge = {
-		corner: null!,
-		next: null!,
-	};
-	const halfEdgeB: HalfEdge = {
-		corner: null!,
-		next: null!,
-	};
+	const halfEdgeA = makeDisconnectedHalfEdge();
+	const halfEdgeB = makeDisconnectedHalfEdge();
 
 	corner.firstHalfEdge = halfEdgeA;
 	halfEdgeA.corner = corner;
@@ -78,10 +70,7 @@ test("cornerEdgeCount broken", () => {
 		position: new Coord3({ x: 0, y: 0, z: 0 }),
 		firstHalfEdge: null!,
 	};
-	const halfEdge: HalfEdge = {
-		corner: null!,
-		next: null!,
-	};
+	const halfEdge = makeDisconnectedHalfEdge();
 
 	cornerA.firstHalfEdge = halfEdge;
 	halfEdge.next = halfEdge;
