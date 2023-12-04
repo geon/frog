@@ -193,3 +193,13 @@ test("prevHalfEdgeAroundCorner", () => {
 
 	expect(Mesh.prevHalfEdgeAroundCorner(corner.firstHalfEdge)).toBe(halfEdgeC);
 });
+
+test("splitEdge", () => {
+	const mesh = Mesh.makeSquare();
+	const polygonHalfEdges = Mesh.polygonHalfEdges(mesh.polygons[0]!);
+	mesh.splitEdge(polygonHalfEdges[0]!);
+	expect(mesh.corners.length).toBe(4);
+	expect(mesh.polygons.length).toBe(3);
+	expect(mesh.halfEdges.length).toBe(10);
+	expect(mesh.isValid()).toBe(true);
+});

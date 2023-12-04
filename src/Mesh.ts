@@ -38,7 +38,7 @@ export class Mesh {
 			this.polygons.every((polygon) => {
 				const count = Mesh.polygonEdgeCount(polygon);
 				// 2-sided polygons are topologically valid, but can't be rendered.
-				return count !== undefined && count >= 3;
+				return count !== undefined && count >= 2;
 			}) &&
 			this.halfEdges.every(
 				// halfEdge.twin.twin should reference itself.
@@ -132,6 +132,48 @@ export class Mesh {
 		mesh.halfEdges = halfEdges;
 
 		return mesh;
+	}
+
+	/*
+	The new polygon will be 2-sided, between the old edge and the new.
+	I choose the old edge to be on top in the diagram. The left "+" is the  halfEdge's corner.
+	When a half-edge is facing a corner, its polygon is to its right side.
+	   |        |
+	---+========+---
+	   |        |
+	*/
+	splitEdge(halfEdge: HalfEdge): {
+		newPolygon: Polygon;
+	} {
+		const newPolygon: Polygon = {
+			firstHalfEdge: halfEdge.twin,
+		};
+
+		// Copy the existing edge.
+		const newHalfEdgeA: HalfEdge = { ...halfEdge };
+		const newHalfEdgeB: HalfEdge = { ...halfEdge.twin };
+
+		// Make the new half-edges a pair.
+		newHalfEdgeA.twin = newHalfEdgeB;
+		newHalfEdgeB.twin = newHalfEdgeA;
+
+		// Insert the new half-edges around their corners.
+		// Left corner:
+		halfEdge.next = newHalfEdgeA;
+		// Right corner:
+		Mesh.prevHalfEdgeAroundCorner(halfEdge.twin).next = newHalfEdgeB;
+		newHalfEdgeB.next = halfEdge.twin;
+
+		// Insert the polygon between the edges.
+		// Edges go ccw around polygons.
+		halfEdge.twin.polygon.firstHalfEdge = newHalfEdgeB;
+		halfEdge.twin.polygon = newPolygon;
+		newHalfEdgeA.polygon = newPolygon;
+
+		this.polygons.push(newPolygon);
+		this.halfEdges.push(newHalfEdgeA, newHalfEdgeB);
+
+		return { newPolygon };
 	}
 
 	static cornerEdgeCount(corner: Corner): number | undefined {
