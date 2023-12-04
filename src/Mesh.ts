@@ -177,4 +177,12 @@ export class Mesh {
 		} while (halfEdge !== polygon.firstHalfEdge);
 		return polygonHalfEdges;
 	}
+
+	static prevHalfEdgeAroundCorner(halfEdge: HalfEdge): HalfEdge {
+		let current = halfEdge;
+		while (current.next !== halfEdge) {
+			current = current.next;
+		}
+		return current;
+	}
 }

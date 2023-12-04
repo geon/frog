@@ -172,3 +172,24 @@ test("polygonHalfEdges", () => {
 	const polygonHalfEdges = Mesh.polygonHalfEdges(mesh.polygons[0]!);
 	expect(polygonHalfEdges.length).toBe(4);
 });
+
+test("prevHalfEdgeAroundCorner", () => {
+	const corner: Corner = {
+		position: new Coord3({ x: 0, y: 0, z: 0 }),
+		firstHalfEdge: null!,
+	};
+	const halfEdgeA = makeDisconnectedHalfEdge();
+	const halfEdgeB = makeDisconnectedHalfEdge();
+	const halfEdgeC = makeDisconnectedHalfEdge();
+
+	corner.firstHalfEdge = halfEdgeA;
+	halfEdgeA.corner = corner;
+	halfEdgeB.corner = corner;
+	halfEdgeC.corner = corner;
+
+	halfEdgeA.next = halfEdgeB;
+	halfEdgeB.next = halfEdgeC;
+	halfEdgeC.next = halfEdgeA;
+
+	expect(Mesh.prevHalfEdgeAroundCorner(corner.firstHalfEdge)).toBe(halfEdgeC);
+});
