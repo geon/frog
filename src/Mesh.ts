@@ -5,10 +5,17 @@ export interface Corner {
 	position: Coord3;
 }
 
+export interface Polygon {
+	firstHalfEdge: HalfEdge;
+}
+
 export interface HalfEdge {
 	corner: Corner;
+	polygon: Polygon;
 	// Next half-edge around the corner clockwise.
 	next: HalfEdge;
+	// The other half of the half-edge.
+	twin: HalfEdge;
 }
 
 export class Mesh {
@@ -28,6 +35,23 @@ export class Mesh {
 				return undefined;
 			}
 		} while (halfEdge !== corner.firstHalfEdge);
+		return count;
+	}
+
+	static polygonEdgeCount(polygon: Polygon): number | undefined {
+		let count = 0;
+		let halfEdge = polygon.firstHalfEdge;
+		do {
+			// Implementation is identical to cornerEdgeCount, except for this line.
+			halfEdge = halfEdge.twin.next;
+			++count;
+			if (count > 1000) {
+				return undefined;
+			}
+			if (halfEdge.polygon !== polygon) {
+				return undefined;
+			}
+		} while (halfEdge !== polygon.firstHalfEdge);
 		return count;
 	}
 }
