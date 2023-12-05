@@ -214,8 +214,8 @@ export class Mesh {
 		const polygonHalfEdges: Array<HalfEdge> = [];
 		let halfEdge = polygon.firstHalfEdge;
 		do {
-			halfEdge = halfEdge.twin.next;
 			polygonHalfEdges.push(halfEdge);
+			halfEdge = halfEdge.twin.next;
 		} while (halfEdge !== polygon.firstHalfEdge);
 		return polygonHalfEdges;
 	}
