@@ -203,3 +203,11 @@ test("splitEdge", () => {
 	expect(mesh.halfEdges.length).toBe(10);
 	expect(mesh.isValid()).toBe(true);
 });
+
+test("halfEdgesAroundCorner", () => {
+	const mesh = Mesh.makeSquare();
+	const halfEdgesAroundCorner = Mesh.halfEdgesAroundCorner(mesh.corners[0]!);
+	expect(halfEdgesAroundCorner.length).toBe(2);
+	expect(halfEdgesAroundCorner).toContain(mesh.halfEdges[0]);
+	expect(halfEdgesAroundCorner).toContain(mesh.halfEdges[7]);
+});

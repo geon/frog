@@ -227,4 +227,14 @@ export class Mesh {
 		}
 		return current;
 	}
+
+	static halfEdgesAroundCorner(corner: Corner): Array<HalfEdge> {
+		const halfEdges: Array<HalfEdge> = [];
+		let halfEdge = corner.firstHalfEdge;
+		do {
+			halfEdges.push(halfEdge);
+			halfEdge = halfEdge.next;
+		} while (halfEdge !== corner.firstHalfEdge);
+		return halfEdges;
+	}
 }
