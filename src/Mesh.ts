@@ -237,4 +237,10 @@ export class Mesh {
 		} while (halfEdge !== corner.firstHalfEdge);
 		return halfEdges;
 	}
+
+	static polygonsAroundCorner(corner: Corner): Array<Polygon> {
+		return Mesh.halfEdgesAroundCorner(corner).map(
+			(halfEdge) => halfEdge.polygon,
+		);
+	}
 }

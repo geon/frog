@@ -211,3 +211,9 @@ test("halfEdgesAroundCorner", () => {
 	expect(halfEdgesAroundCorner).toContain(mesh.halfEdges[0]);
 	expect(halfEdgesAroundCorner).toContain(mesh.halfEdges[7]);
 });
+
+test("polygonsAroundCorner", () => {
+	const mesh = Mesh.makeSquare();
+	const polygonsAroundCorner = Mesh.polygonsAroundCorner(mesh.corners[0]!);
+	expect(polygonsAroundCorner.length).toBe(2);
+});
