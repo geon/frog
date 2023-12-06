@@ -1,4 +1,5 @@
 import { Coord3 } from "./Coord3";
+import { allPairs } from "./functional";
 
 export interface Corner {
 	firstHalfEdge: HalfEdge;
@@ -144,10 +145,9 @@ export class Mesh {
 	*/
 	splitEdge(halfEdge: HalfEdge): {
 		newPolygon: Polygon;
+		newEdge: readonly [HalfEdge, HalfEdge];
 	} {
-		const newPolygon: Polygon = {
-			firstHalfEdge: halfEdge.twin,
-		};
+		const newPolygon: Polygon = { firstHalfEdge: halfEdge.twin };
 
 		// Copy the existing edge.
 		const newHalfEdgeA: HalfEdge = { ...halfEdge };
@@ -171,9 +171,10 @@ export class Mesh {
 		newHalfEdgeA.polygon = newPolygon;
 
 		this.polygons.push(newPolygon);
-		this.halfEdges.push(newHalfEdgeA, newHalfEdgeB);
+		const newEdge = [newHalfEdgeA, newHalfEdgeB] as const;
+		this.halfEdges.push(...newEdge);
 
-		return { newPolygon };
+		return { newPolygon, newEdge };
 	}
 
 	/*
@@ -227,22 +228,21 @@ export class Mesh {
 			halfEdgesAroundCorner.find((x) => x.twin.polygon == polygons[1]),
 		);
 
+		// All edges from c to d now belongs to newCorner.
+		for (
+			let halfEdgeToFix = halfEdgeC;
+			halfEdgeToFix !== halfEdgeD.next;
+			halfEdgeToFix = halfEdgeToFix.next
+		) {
+			halfEdgeToFix.corner = newCorner;
+		}
+
 		// Connect the half-edge pointing at the top left (original) corner.
 		newEdge[0].next = halfEdgeA;
 		halfEdgeB.next = newEdge[0];
 		// Connect the half-edge pointing to the bottom right (new) corner.
 		newEdge[1].next = halfEdgeC;
 		halfEdgeD.next = newEdge[1];
-
-		// All edges from c to d now belongs to newCorner.
-		for (
-			let halfEdgeToFix = halfEdgeC;
-			halfEdgeToFix.next !== halfEdgeD;
-			halfEdgeToFix = halfEdgeToFix.next
-		) {
-			halfEdgeToFix.corner = newCorner;
-		}
-		halfEdgeD.corner = newCorner;
 
 		// The corner's firstHalfEdge might not belong to it anymore.
 		corner.firstHalfEdge = newEdge[0];
@@ -252,6 +252,40 @@ export class Mesh {
 		this.halfEdges.push(...newEdge);
 
 		return { newCorner, newEdge };
+	}
+
+	splitEdges(halfEdges: ReadonlyArray<HalfEdge>): {
+		newPolygons: Array<Polygon>;
+	} {
+		// Split the edges.
+		const splitEdges = halfEdges.map((halfEdge) => this.splitEdge(halfEdge));
+		const newPolygons = splitEdges.map((x) => x.newPolygon);
+
+		// Split the corners, inserting a new edge between them, making the new polygons share this edge.
+		const touchedCorners = [
+			...new Set(
+				halfEdges.flatMap((halfEdge) => [
+					halfEdge.corner,
+					halfEdge.twin.corner,
+				]),
+			),
+		];
+		const isNewPolygon = Set.prototype.has.bind(new Set(newPolygons));
+		const cornersToSplit = touchedCorners.flatMap(
+			(corner): { corner: Corner; polygonPairs: Array<[Polygon, Polygon]> } => {
+				const newPolygonsAtCorner =
+					Mesh.polygonsAroundCorner(corner).filter(isNewPolygon);
+				return { corner, polygonPairs: allPairs(newPolygonsAtCorner) };
+			},
+		);
+
+		cornersToSplit.forEach(({ corner, polygonPairs }) =>
+			polygonPairs.forEach((polygonPair) =>
+				this.splitCorner(corner, polygonPair),
+			),
+		);
+
+		return { newPolygons };
 	}
 
 	static cornerEdgeCount(corner: Corner): number | undefined {

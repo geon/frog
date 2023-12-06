@@ -226,3 +226,51 @@ test("splitCorner", () => {
 	expect(mesh.halfEdges.length).toBe(10);
 	expect(mesh.isValid()).toBe(true);
 });
+
+test("splitEdges 1 edge", () => {
+	const mesh = Mesh.makeSquare();
+	const polygonHalfEdges = Mesh.polygonHalfEdges(mesh.polygons[0]!);
+	const { newPolygons } = mesh.splitEdges([polygonHalfEdges[0]!]);
+	expect(newPolygons.length).toBe(1);
+	expect(mesh.corners.length).toBe(4);
+	expect(mesh.polygons.length).toBe(3);
+	expect(mesh.halfEdges.length).toBe(10);
+	expect(mesh.isValid()).toBe(true);
+});
+
+test("splitEdges 2 connected edges", () => {
+	const mesh = Mesh.makeSquare();
+	const polygonHalfEdges = Mesh.polygonHalfEdges(mesh.polygons[0]!);
+	const { newPolygons } = mesh.splitEdges([
+		polygonHalfEdges[0]!,
+		polygonHalfEdges[1]!,
+	]);
+
+	// console.log("CORNERS");
+	// console.table(
+	// 	mesh.corners.map((x) => ({ name: x.name, halfEdge: x.firstHalfEdge.name })),
+	// );
+	// console.log("POLYGONS");
+	// console.table(
+	// 	mesh.polygons.map((x) => ({
+	// 		name: x.name,
+	// 		halfEdge: x.firstHalfEdge.name,
+	// 	})),
+	// );
+	// console.log("HALFEDGES");
+	// console.table(
+	// 	mesh.halfEdges.map((x) => ({
+	// 		name: x.name,
+	// 		twin: x.twin.name,
+	// 		corner: x.corner.name,
+	// 		polygon: x.polygon.name,
+	// 		next: x.next.name,
+	// 	})),
+	// );
+
+	expect(newPolygons.length).toBe(2);
+	expect(mesh.corners.length).toBe(5);
+	expect(mesh.polygons.length).toBe(4);
+	expect(mesh.halfEdges.length).toBe(14);
+	expect(mesh.isValid()).toBe(true);
+});
