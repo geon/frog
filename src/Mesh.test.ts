@@ -217,3 +217,12 @@ test("polygonsAroundCorner", () => {
 	const polygonsAroundCorner = Mesh.polygonsAroundCorner(mesh.corners[0]!);
 	expect(polygonsAroundCorner.length).toBe(2);
 });
+
+test("splitCorner", () => {
+	const mesh = Mesh.makeSquare();
+	mesh.splitCorner(mesh.corners[0]!, [mesh.polygons[0]!, mesh.polygons[1]!]);
+	expect(mesh.corners.length).toBe(5);
+	expect(mesh.polygons.length).toBe(2);
+	expect(mesh.halfEdges.length).toBe(10);
+	expect(mesh.isValid()).toBe(true);
+});

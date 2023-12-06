@@ -176,6 +176,84 @@ export class Mesh {
 		return { newPolygon };
 	}
 
+	/*
+	Split the corner "+" into 2, inserting a new pair of half-edges between polygons p0 and p1.
+	I chose the top
+	Before;
+	    |  p0
+	----+----
+	p1  |
+
+	After:
+	    |
+	----+
+	p1   \   p0
+	      +----
+	      |
+	I choose the top left corner ("+") to be the original corner.
+	I call the original halfEdges a-d:
+	     b
+	     |
+	a----+----c
+	     |
+	     d
+	After the split, a & b will belong to the original corner, and c & d will belong to the new corner.
+	Remember that this is just an example. There could be any number of edges between a & b and c & d, respectively.
+	*/
+	splitCorner(
+		corner: Corner,
+		polygons: [Polygon, Polygon],
+	): { newCorner: Corner; newEdge: [HalfEdge, HalfEdge] } {
+		const newCorner: Corner = { ...corner };
+		const newEdge: [HalfEdge, HalfEdge] = [
+			{ corner: corner, polygon: polygons[0], next: null!, twin: null! },
+			{ corner: newCorner, polygon: polygons[1], next: null!, twin: null! },
+		];
+		newEdge[0].twin = newEdge[1];
+		newEdge[1].twin = newEdge[0];
+
+		// Find the half-edges bordering the selected plygons.
+		const halfEdgesAroundCorner = Mesh.halfEdgesAroundCorner(corner);
+		const halfEdgeA = assumeDefined(
+			halfEdgesAroundCorner.find((x) => x.polygon == polygons[1]),
+		);
+		const halfEdgeB = assumeDefined(
+			halfEdgesAroundCorner.find((x) => x.twin.polygon == polygons[0]),
+		);
+		const halfEdgeC = assumeDefined(
+			halfEdgesAroundCorner.find((x) => x.polygon == polygons[0]),
+		);
+		const halfEdgeD = assumeDefined(
+			halfEdgesAroundCorner.find((x) => x.twin.polygon == polygons[1]),
+		);
+
+		// Connect the half-edge pointing at the top left (original) corner.
+		newEdge[0].next = halfEdgeA;
+		halfEdgeB.next = newEdge[0];
+		// Connect the half-edge pointing to the bottom right (new) corner.
+		newEdge[1].next = halfEdgeC;
+		halfEdgeD.next = newEdge[1];
+
+		// All edges from c to d now belongs to newCorner.
+		for (
+			let halfEdgeToFix = halfEdgeC;
+			halfEdgeToFix.next !== halfEdgeD;
+			halfEdgeToFix = halfEdgeToFix.next
+		) {
+			halfEdgeToFix.corner = newCorner;
+		}
+		halfEdgeD.corner = newCorner;
+
+		// The corner's firstHalfEdge might not belong to it anymore.
+		corner.firstHalfEdge = newEdge[0];
+		newCorner.firstHalfEdge = newEdge[1];
+
+		this.corners.push(newCorner);
+		this.halfEdges.push(...newEdge);
+
+		return { newCorner, newEdge };
+	}
+
 	static cornerEdgeCount(corner: Corner): number | undefined {
 		let count = 0;
 		let halfEdge = corner.firstHalfEdge;
@@ -243,4 +321,15 @@ export class Mesh {
 			(halfEdge) => halfEdge.polygon,
 		);
 	}
+}
+
+function isDefined<T>(x: T | undefined | null): x is T {
+	return x !== undefined && x !== null;
+}
+
+function assumeDefined<T>(x: T | undefined | null): T {
+	if (!isDefined(x)) {
+		throw new Error("Not defined.");
+	}
+	return x;
 }
