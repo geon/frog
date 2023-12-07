@@ -135,6 +135,18 @@ export class Mesh {
 		return mesh;
 	}
 
+	static makeCube(): Mesh {
+		// Build a cube by extruding a square.
+		const mesh = Mesh.makeSquare();
+		const top = mesh.polygons[0]!;
+		const bottom = mesh.polygons[1]!;
+		const squareCircumference = Mesh.polygonHalfEdges(top);
+		mesh.splitEdges(squareCircumference);
+		Mesh.cornersAroundPolygon(top).forEach((x) => (x.position.z = 1));
+		Mesh.cornersAroundPolygon(bottom).forEach((x) => (x.position.z = -1));
+		return mesh;
+	}
+
 	/*
 	The new polygon will be 2-sided, between the old edge and the new.
 	I choose the old edge to be on top in the diagram. The left "+" is the  halfEdge's corner.

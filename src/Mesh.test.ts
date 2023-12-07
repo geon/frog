@@ -280,3 +280,11 @@ test("cornersAroundPolygon", () => {
 	const cornersAroundPolygon = Mesh.cornersAroundPolygon(mesh.polygons[0]!);
 	expect(cornersAroundPolygon.length).toBe(4);
 });
+
+test("makeCube", () => {
+	const mesh = Mesh.makeCube();
+	expect(mesh.corners.length).toBe(8);
+	expect(mesh.polygons.length).toBe(6);
+	expect(mesh.halfEdges.length).toBe(24);
+	expect(mesh.isValid()).toBe(true);
+});
