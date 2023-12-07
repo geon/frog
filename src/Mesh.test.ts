@@ -287,4 +287,10 @@ test("makeCube", () => {
 	expect(mesh.polygons.length).toBe(6);
 	expect(mesh.halfEdges.length).toBe(24);
 	expect(mesh.isValid()).toBe(true);
+	for (const corner of mesh.corners) {
+		const edgeLengths = Mesh.halfEdgesAroundCorner(corner)
+			.map((x) => x.twin.corner)
+			.map((x) => Coord3.distance(x.position, corner.position));
+		expect(edgeLengths).toStrictEqual([2, 2, 2]);
+	}
 });

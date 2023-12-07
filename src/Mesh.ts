@@ -217,7 +217,10 @@ export class Mesh {
 		corner: Corner,
 		polygons: [Polygon, Polygon],
 	): { newCorner: Corner; newEdge: [HalfEdge, HalfEdge] } {
-		const newCorner: Corner = { ...corner };
+		const newCorner: Corner = {
+			...corner,
+			position: new Coord3(corner.position),
+		};
 		const newEdge: [HalfEdge, HalfEdge] = [
 			{ corner: corner, polygon: polygons[0], next: null!, twin: null! },
 			{ corner: newCorner, polygon: polygons[1], next: null!, twin: null! },
