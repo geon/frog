@@ -274,3 +274,9 @@ test("splitEdges 2 connected edges", () => {
 	expect(mesh.halfEdges.length).toBe(14);
 	expect(mesh.isValid()).toBe(true);
 });
+
+test("cornersAroundPolygon", () => {
+	const mesh = Mesh.makeSquare();
+	const cornersAroundPolygon = Mesh.cornersAroundPolygon(mesh.polygons[0]!);
+	expect(cornersAroundPolygon.length).toBe(4);
+});

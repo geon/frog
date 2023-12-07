@@ -355,6 +355,10 @@ export class Mesh {
 			(halfEdge) => halfEdge.polygon,
 		);
 	}
+
+	static cornersAroundPolygon(polygon: Polygon): Array<Corner> {
+		return Mesh.polygonHalfEdges(polygon).map((halfEdge) => halfEdge.corner);
+	}
 }
 
 function isDefined<T>(x: T | undefined | null): x is T {
